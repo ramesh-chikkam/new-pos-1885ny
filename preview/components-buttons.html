@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin: 0; background: #f4f4f4; padding: 24px; font-family: 'DM Sans', sans-serif; display: flex; flex-wrap: wrap; gap: 16px; align-items: flex-start; }
+.group { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.group-label { font-size: 10px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #aaa; }
+.btn-primary { background: #ff6347; color: #fff; border: none; padding: 12px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-primary:hover { background: #ff4500; }
+.btn-dark { background: #333; color: #fff; border: none; padding: 12px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-outline { background: transparent; color: #ff6347; border: 2px solid #ff6347; padding: 10px 26px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 15px; font-weight: 700; cursor: pointer; }
+.btn-sm { background: #ff6347; color: #fff; border: none; padding: 7px 16px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600; cursor: pointer; }
+.btn-disabled { background: #ccc; color: #888; border: none; padding: 12px 28px; border-radius: 5px; font-family: 'DM Sans', sans-serif; font-size: 15px; cursor: not-allowed; }
+.on-dark { background: #333; padding: 16px; border-radius: 8px; display: flex; gap: 10px; align-items: center; }
+</style>
+</head><body>
+<div class="group">
+  <div class="group-label">Primary</div>
+  <button class="btn-primary">Order Now</button>
+  <button class="btn-primary" style="background:#ff4500">Hover State</button>
+</div>
+<div class="group">
+  <div class="group-label">Dark</div>
+  <button class="btn-dark">View Menu</button>
+</div>
+<div class="group">
+  <div class="group-label">Outline</div>
+  <button class="btn-outline">Learn More</button>
+</div>
+<div class="group">
+  <div class="group-label">Small</div>
+  <button class="btn-sm">Add to Cart</button>
+</div>
+<div class="group">
+  <div class="group-label">Disabled</div>
+  <button class="btn-disabled" disabled>Unavailable</button>
+</div>
+<div class="group">
+  <div class="group-label">On Dark</div>
+  <div class="on-dark">
+    <button class="btn-primary">Order Now</button>
+    <button class="btn-outline" style="border-color:#fff;color:#fff">Find Us</button>
+  </div>
+</div>
+</body></html>

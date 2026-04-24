@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>1885NY — 80mm Receipt</title>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #d0d0d0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 32px 16px;
+    gap: 20px;
+    font-family: 'DM Mono', 'Courier New', monospace;
+  }
+
+  /* ── Screen chrome ── */
+  .toolbar {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .btn {
+    background: #1a1a1a;
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 11px 22px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+  }
+  .btn.red { background: #ff6347; }
+  .btn.outline { background: #fff; color: #1a1a1a; border: 2px solid #ccc; }
+
+  /* ── Roll shadow effect ── */
+  .roll-top {
+    width: 304px;
+    height: 12px;
+    background: repeating-linear-gradient(90deg, #bbb 0, #bbb 6px, #c8c8c8 6px, #c8c8c8 12px);
+    border-radius: 4px 4px 0 0;
+  }
+  .roll-bottom {
+    width: 304px;
+    height: 12px;
+    background: repeating-linear-gradient(90deg, #bbb 0, #bbb 6px, #c8c8c8 6px, #c8c8c8 12px);
+    border-radius: 0 0 4px 4px;
+  }
+
+  /* ── Main receipt ── */
+  .receipt {
+    width: 304px; /* 80mm at 96dpi ≈ 302px */
+    background: #fff;
+    padding: 16px 14px 20px;
+    box-shadow: 0 4px 24px rgba(0,0,0,.2);
+  }
+
+  /* ── Typography helpers ── */
+  .center { text-align: center; }
+  .right  { text-align: right; }
+  .bold   { font-weight: 700; }
+
+  /* ── Logo area ── */
+  .logo-area {
+    text-align: center;
+    margin-bottom: 8px;
+  }
+  .logo-area img {
+    height: 44px;
+    width: auto;
+    /* thermal print: logo renders as bitmap — dark bg logo shows well */
+    filter: brightness(0); /* force black for print */
+  }
+  .brand-name {
+    font-family: 'Anton', sans-serif;
+    font-size: 18px;
+    letter-spacing: 0.04em;
+    color: #000;
+    margin-top: 2px;
+  }
+  .tagline {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #555;
+    margin-top: 2px;
+  }
+
+  /* ── Dividers ── */
+  .div-solid { border: none; border-top: 2px solid #000; margin: 8px 0; }
+  .div-dash  { border: none; border-top: 1px dashed #888; margin: 6px 0; }
+  .div-star  {
+    text-align: center;
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    color: #555;
+    letter-spacing: 2px;
+    margin: 6px 0;
+  }
+
+  /* ── Section heading ── */
+  .sec-head {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #888;
+    text-align: center;
+    margin-bottom: 5px;
+  }
+
+  /* ── Meta rows ── */
+  .meta {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #333;
+    margin-bottom: 3px;
+    line-height: 1.4;
+  }
+  .meta .lbl { color: #888; font-size: 9px; }
+  .meta .val { font-weight: 500; }
+  .meta .val.accent { color: #000; font-weight: 700; }
+
+  /* ── Items ── */
+  .item { margin-bottom: 5px; }
+  .item-name {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    display: flex;
+    justify-content: space-between;
+  }
+  .item-detail {
+    font-size: 9px;
+    color: #888;
+    display: flex;
+    justify-content: space-between;
+    padding-left: 8px;
+    margin-top: 1px;
+  }
+  .item-tax {
+    font-size: 9px;
+    color: #aaa;
+    padding-left: 8px;
+    margin-top: 1px;
+  }
+
+  /* ── Totals ── */
+  .tot-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 10px;
+    color: #333;
+    margin-bottom: 3px;
+  }
+  .tot-row.tax { color: #666; font-size: 9px; }
+  .tot-row.big {
+    font-family: 'Anton', sans-serif;
+    font-size: 16px;
+    color: #000;
+    margin-top: 4px;
+    letter-spacing: 0.02em;
+  }
+  .tot-row.subtax {
+    font-size: 9px;
+    color: #888;
+    padding-left: 6px;
+    margin-bottom: 2px;
+  }
+
+  /* ── Payment box ── */
+  .pay-box {
+    background: #f0f0f0;
+    border-radius: 3px;
+    padding: 7px 10px;
+    margin: 6px 0;
+  }
+  .pay-method {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    color: #000;
+    margin-bottom: 3px;
+  }
+  .pay-detail {
+    font-size: 10px;
+    color: #555;
+  }
+  .change-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 11px;
+    font-weight: 700;
+    color: #000;
+    margin-top: 4px;
+  }
+
+  /* ── Footer ── */
+  .footer-msg {
+    font-family: 'Anton', sans-serif;
+    font-size: 14px;
+    text-align: center;
+    color: #000;
+    letter-spacing: 0.03em;
+    margin-bottom: 3px;
+  }
+  .footer-sub {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 8px;
+    text-align: center;
+    color: #888;
+    line-height: 1.6;
+  }
+  .qr-placeholder {
+    width: 64px;
+    height: 64px;
+    margin: 8px auto;
+    background: #f4f4f4;
+    border: 1px dashed #ccc;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 8px;
+    color: #bbb;
+    text-align: center;
+    font-family: 'DM Sans', sans-serif;
+    border-radius: 4px;
+    line-height: 1.4;
+  }
+
+  /* ── @page PRINT ── */
+  @media print {
+    @page {
+      size: 80mm auto;   /* 80mm roll, auto height */
+      margin: 4mm 4mm;
+    }
+    body {
+      background: #fff;
+      padding: 0;
+      display: block;
+    }
+    .toolbar { display: none; }
+    .roll-top, .roll-bottom { display: none; }
+    .receipt {
+      width: 100%;
+      box-shadow: none;
+      padding: 0;
+    }
+    .logo-area img { filter: brightness(0); }
+    .pay-box { background: #eee; }
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <button class="btn" onclick="window.print()">🖨 Print / Save PDF</button>
+  <button class="btn red" onclick="switchUPI()">Switch to UPI</button>
+  <button class="btn outline" onclick="switchCash()">Switch to Cash</button>
+</div>
+
+<div class="roll-top"></div>
+
+<div class="receipt">
+
+  <!-- Logo -->
+  <div class="logo-area">
+    <img src="../../assets/logo.png" alt="1885NY">
+    <div class="tagline">Delicious · Chef-Driven · Smash Burgers</div>
+  </div>
+
+  <hr class="div-solid">
+  <div class="sec-head">TAX INVOICE · GST RECEIPT</div>
+
+  <!-- Store info -->
+  <div class="meta"><span class="lbl">Store</span><span class="val">Gachibowli · UNOS Food Market</span></div>
+  <div class="meta"><span class="lbl">Address</span><span class="val" style="text-align:right;max-width:170px">Gachibowli, Hyderabad — 500032</span></div>
+  <div class="meta"><span class="lbl">GSTIN</span><span class="val accent">36XXXXX1234Z5</span></div>
+  <div class="meta"><span class="lbl">FSSAI</span><span class="val">10020042012345</span></div>
+
+  <hr class="div-dash">
+
+  <!-- Bill meta -->
+  <div class="meta"><span class="lbl">Invoice No.</span><span class="val accent" id="inv-no">ORD-B2F94A</span></div>
+  <div class="meta"><span class="lbl">Date</span><span class="val">24 Apr 2026</span></div>
+  <div class="meta"><span class="lbl">Time</span><span class="val">01:42 PM</span></div>
+  <div class="meta"><span class="lbl">Type</span><span class="val" id="order-type">Dine In · Table T-04</span></div>
+  <div class="meta"><span class="lbl">Cashier</span><span class="val">Priya S.</span></div>
+
+  <hr class="div-dash">
+  <div class="sec-head">Order Items</div>
+
+  <!-- Items -->
+  <div class="item">
+    <div class="item-name"><span>Classic Smash Burger</span><span>₹499.00</span></div>
+    <div class="item-detail"><span>Qty: 1 × ₹499.00</span><span>HSN: 2106</span></div>
+    <div class="item-tax">CGST 2.5%: ₹12.48 &nbsp;|&nbsp; SGST 2.5%: ₹12.48</div>
+  </div>
+
+  <div class="item">
+    <div class="item-name"><span>Double Smash Stack</span><span>₹699.00</span></div>
+    <div class="item-detail"><span>Qty: 1 × ₹699.00</span><span>HSN: 2106</span></div>
+    <div class="item-tax">CGST 2.5%: ₹17.48 &nbsp;|&nbsp; SGST 2.5%: ₹17.48</div>
+  </div>
+
+  <div class="item">
+    <div class="item-name"><span>Smash Fries</span><span>₹298.00</span></div>
+    <div class="item-detail"><span>Qty: 2 × ₹149.00</span><span>HSN: 2106</span></div>
+    <div class="item-tax">CGST 2.5%: ₹7.45 &nbsp;|&nbsp; SGST 2.5%: ₹7.45</div>
+  </div>
+
+  <div class="item">
+    <div class="item-name"><span>Cold Drink (Can) ×2</span><span>₹120.00</span></div>
+    <div class="item-detail"><span>Qty: 2 × ₹60.00</span><span>HSN: 2202</span></div>
+    <div class="item-tax">CGST 14%: ₹16.80 &nbsp;|&nbsp; SGST 14%: ₹16.80</div>
+  </div>
+
+  <hr class="div-solid">
+
+  <!-- Totals -->
+  <div class="tot-row"><span>Subtotal (before tax)</span><span>₹1,616.00</span></div>
+
+  <div class="tot-row subtax"><span>↳ CGST @ 2.5%</span><span>₹54.20</span></div>
+  <div class="tot-row subtax"><span>↳ SGST @ 2.5%</span><span>₹54.20</span></div>
+
+  <div class="tot-row tax"><span>Total Tax Collected</span><span>₹108.40</span></div>
+  <div class="tot-row tax"><span>Rounding Adjustment</span><span>+₹0.00</span></div>
+
+  <hr class="div-solid">
+  <div class="tot-row big"><span>TOTAL</span><span>₹1,724.40</span></div>
+  <hr class="div-solid">
+
+  <!-- Payment -->
+  <div class="pay-box" id="pay-box">
+    <div class="pay-method" id="pay-method">💵 Cash Payment</div>
+    <div class="pay-detail" id="pay-detail">Tendered: ₹2,000.00</div>
+    <div class="change-row"><span>Change Returned</span><span id="change-amt">₹275.60</span></div>
+  </div>
+
+  <hr class="div-dash">
+
+  <!-- QR -->
+  <div class="qr-placeholder">Scan to<br>Order Again<br>/ Feedback</div>
+  <div class="footer-sub" style="margin-top:4px">unosfoodmarket.dotpe.in</div>
+
+  <div class="div-star">* * * * * * * * * * * * *</div>
+
+  <!-- Footer -->
+  <div class="footer-msg">THANK YOU!</div>
+  <div class="footer-sub">
+    Smash Club: earn 1 point per ₹100 spent<br>
+    Follow us @1885NYBurgers<br>
+    Queries: +91 98765 43210
+  </div>
+
+  <hr class="div-dash">
+  <div class="footer-sub" style="font-size:7px; margin-top:4px">
+    Computer generated invoice. No signature required.<br>
+    Subject to Hyderabad jurisdiction.
+  </div>
+
+</div>
+
+<div class="roll-bottom"></div>
+
+<script>
+function switchUPI() {
+  document.getElementById('pay-method').textContent = '📱 UPI Payment';
+  document.getElementById('pay-detail').textContent = 'UPI Ref: 885492173400 · PAID';
+  document.getElementById('change-amt').textContent = '₹0.00';
+  document.getElementById('order-type').textContent = 'Takeaway';
+}
+function switchCash() {
+  document.getElementById('pay-method').textContent = '💵 Cash Payment';
+  document.getElementById('pay-detail').textContent = 'Tendered: ₹2,000.00';
+  document.getElementById('change-amt').textContent = '₹275.60';
+  document.getElementById('order-type').textContent = 'Dine In · Table T-04';
+}
+</script>
+</body>
+</html>

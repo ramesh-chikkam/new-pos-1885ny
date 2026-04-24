@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin: 0; background: #fff; font-family: 'DM Sans', Arial, sans-serif; padding: 20px; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.token { border-radius: 6px; overflow: hidden; border: 1px solid #eee; }
+.token-swatch { height: 44px; }
+.token-info { padding: 6px 8px; background: #fafafa; }
+.token-name { font-size: 10px; font-weight: 600; color: #333; font-family: 'DM Mono', monospace; }
+.token-desc { font-size: 9px; color: #888; }
+</style>
+</head><body>
+<div class="grid">
+  <div class="token"><div class="token-swatch" style="background:#1a1a1a"></div><div class="token-info"><div class="token-name">--fg1</div><div class="token-desc">Primary text</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#555555"></div><div class="token-info"><div class="token-name">--fg2</div><div class="token-desc">Secondary text</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#888888"></div><div class="token-info"><div class="token-name">--fg3</div><div class="token-desc">Muted text</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#ffffff; border:1px solid #eee"></div><div class="token-info"><div class="token-name">--fg-inverse</div><div class="token-desc">On dark bg</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#ff6347"></div><div class="token-info"><div class="token-name">--accent</div><div class="token-desc">CTA / brand</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#ff4500"></div><div class="token-info"><div class="token-name">--accent-hover</div><div class="token-desc">Hover state</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#c9921a"></div><div class="token-info"><div class="token-name">--accent-gold</div><div class="token-desc">Premium / star</div></div></div>
+  <div class="token"><div class="token-swatch" style="background:#fff1ee; border:1px solid #ffe0d9"></div><div class="token-info"><div class="token-name">--accent-pale</div><div class="token-desc">Tinted bg</div></div></div>
+</div>
+</body></html>

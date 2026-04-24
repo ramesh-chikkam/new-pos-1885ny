@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400&display=swap" rel="stylesheet">
+<style>
+body { margin: 0; background: #fff; padding: 20px; font-family: 'DM Mono', monospace; font-size: 10px; color: #555; }
+.section { margin-bottom: 16px; }
+.section-title { font-size: 9px; text-transform: uppercase; letter-spacing: 0.1em; color: #bbb; margin-bottom: 8px; }
+.row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.bar { background: #ff6347; height: 14px; border-radius: 2px; }
+.name { width: 90px; color: #888; }
+.val { color: #333; }
+
+/* Radius */
+.radii { display: flex; gap: 12px; align-items: flex-end; }
+.rbox { width: 36px; height: 36px; background: #ff6347; opacity: 0.7; }
+.rlabel { font-size: 9px; color: #888; text-align: center; margin-top: 4px; }
+
+/* Shadow */
+.shadows { display: flex; gap: 16px; align-items: center; }
+.sbox { width: 44px; height: 28px; background: #fff; border-radius: 6px; }
+</style>
+</head><body>
+<div class="section">
+  <div class="section-title">Spacing Scale</div>
+  <div class="row"><div class="name">--space-1</div><div class="bar" style="width:4px"></div><div class="val">4px</div></div>
+  <div class="row"><div class="name">--space-2</div><div class="bar" style="width:8px"></div><div class="val">8px</div></div>
+  <div class="row"><div class="name">--space-4</div><div class="bar" style="width:16px"></div><div class="val">16px</div></div>
+  <div class="row"><div class="name">--space-6</div><div class="bar" style="width:24px"></div><div class="val">24px</div></div>
+  <div class="row"><div class="name">--space-8</div><div class="bar" style="width:32px"></div><div class="val">32px</div></div>
+  <div class="row"><div class="name">--space-12</div><div class="bar" style="width:48px"></div><div class="val">48px</div></div>
+  <div class="row"><div class="name">--space-20</div><div class="bar" style="width:80px"></div><div class="val">80px</div></div>
+</div>
+
+<div class="section">
+  <div class="section-title">Border Radii</div>
+  <div class="radii">
+    <div><div class="rbox" style="border-radius:4px"></div><div class="rlabel">sm / 4px</div></div>
+    <div><div class="rbox" style="border-radius:8px"></div><div class="rlabel">md / 8px</div></div>
+    <div><div class="rbox" style="border-radius:10px"></div><div class="rlabel">lg / 10px</div></div>
+    <div><div class="rbox" style="border-radius:16px"></div><div class="rlabel">xl / 16px</div></div>
+    <div><div class="rbox" style="border-radius:9999px"></div><div class="rlabel">full</div></div>
+  </div>
+</div>
+
+<div class="section" style="margin-top:14px">
+  <div class="section-title">Shadow Scale</div>
+  <div class="shadows">
+    <div><div class="sbox" style="box-shadow:0 2px 6px rgba(0,0,0,.08)"></div><div class="rlabel">sm</div></div>
+    <div><div class="sbox" style="box-shadow:0 4px 16px rgba(0,0,0,.12)"></div><div class="rlabel">md</div></div>
+    <div><div class="sbox" style="box-shadow:0 8px 32px rgba(0,0,0,.18)"></div><div class="rlabel">lg</div></div>
+    <div><div class="sbox" style="box-shadow:0 4px 6px rgba(0,0,0,.10)"></div><div class="rlabel">card</div></div>
+  </div>
+</div>
+</body></html>

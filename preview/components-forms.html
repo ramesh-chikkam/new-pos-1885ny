@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html><head><meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../colors_and_type.css">
+<style>
+body { margin: 0; background: #f4f4f4; padding: 20px; font-family: 'DM Sans', sans-serif; display: flex; gap: 24px; align-items: flex-start; }
+.form-col { display: flex; flex-direction: column; gap: 10px; }
+.form-group { display: flex; flex-direction: column; gap: 4px; }
+label { font-size: 11px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #888; }
+input, textarea, select { font-family: 'DM Sans', sans-serif; font-size: 14px; padding: 10px 12px; border: 1px solid #ddd; border-radius: 5px; background: #fff; color: #1a1a1a; outline: none; }
+input:focus, textarea:focus, select:focus { border-color: #ff6347; box-shadow: 0 0 0 2px rgba(255,99,71,0.15); }
+textarea { resize: vertical; height: 70px; }
+.input-error { border-color: #e33; }
+.error-msg { font-size: 11px; color: #e33; }
+.search-wrap { position: relative; }
+.search-wrap input { padding-left: 32px; }
+.search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: #aaa; font-size: 14px; }
+</style>
+</head><body>
+<div class="form-col">
+  <div class="form-group"><label>Name</label><input type="text" placeholder="Your Name"></div>
+  <div class="form-group"><label>Email</label><input type="email" placeholder="you@example.com"></div>
+  <div class="form-group"><label>Error State</label><input type="text" class="input-error" value="Bad input"><div class="error-msg">This field is required.</div></div>
+</div>
+<div class="form-col">
+  <div class="form-group"><label>Message</label><textarea placeholder="Your Message"></textarea></div>
+  <div class="form-group"><label>Select</label>
+    <select><option>Classic Smash Burger</option><option>Cheesy Lamb Smash</option><option>Spicy Smash</option></select>
+  </div>
+  <div class="form-group"><label>Search</label>
+    <div class="search-wrap"><span class="search-icon">⌕</span><input type="text" placeholder="Search menu..."></div>
+  </div>
+</div>
+</body></html>

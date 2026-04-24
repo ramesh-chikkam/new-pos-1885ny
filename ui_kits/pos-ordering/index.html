@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>1885NY POS Ordering</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background: #f4f4f4;
+            font-family: 'DM Sans', Arial, sans-serif;
+            min-height: 100vh;
+        }
+
+        #root {
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+const { useState, useEffect } = React;
+
+// ═══════════════════════════════════════════════════════════
+// MENU DATA
+// ═══════════════════════════════════════════════════════════
+const MENU_ITEMS = [
+  { id: 1, name: 'Classic Smash Burger', desc: 'A perfectly smashed, juicy beef patty with melted cheese and our secret sauce.', price: 499, img: '/assets/burger1.jpg', popular: true, category: 'Burgers' },
+  { id: 2, name: 'Cheesy Lamb Smash', desc: 'Juicy beef patty topped with crispy lamb and cheddar cheese.', price: 399, img: '/assets/burger2.jpg', popular: false, category: 'Burgers' },
+  { id: 3, name: 'Spicy Smash', desc: 'A burger with a spicy kick, featuring jalapeños and pepper jack cheese.', price: 299, img: '/assets/burger3.jpg', popular: false, category: 'Burgers' },
+  { id: 4, name: 'Double Smash Stack', desc: 'Two smashed patties, double cheese, caramelized onions, special sauce.', price: 699, img: '/assets/hero-burger.jpg', popular: true, category: 'Burgers' },
+  { id: 5, name: 'NY Crispy Chicken', desc: 'Crispy fried chicken fillet, sriracha mayo, pickles, brioche bun.', price: 349, img: '/assets/burger3.jpg', popular: false, category: 'Chicken' },
+  { id: 6, name: 'Mushroom Swiss Smash', desc: 'Sautéed mushrooms, Swiss cheese, garlic aioli on a smashed beef patty.', price: 449, img: '/assets/burger2.jpg', popular: false, category: 'Burgers' },
+  { id: 7, name: 'Chicken Smash', desc: 'Smashed chicken patty with chipotle sauce', price: 379, img: '/assets/burger1.jpg', popular: false, category: 'Chicken' },
+  { id: 8, name: 'Smash Fries', desc: 'Crispy fries with smash seasoning', price: 149, img: '', popular: false, category: 'Sides' },
+  { id: 9, name: 'Loaded Cheese Fries', desc: 'Fries, cheese sauce, jalapeños', price: 199, img: '', popular: true, category: 'Sides' },
+  { id: 10, name: 'Cold Drink (Can)', desc: 'Pepsi / 7Up / Mirinda', price: 60, img: '', popular: false, category: 'Drinks' },
+  { id: 11, name: 'Fresh Lime Soda', desc: 'Sweet / Salted', price: 79, img: '', popular: false, category: 'Drinks' },
+];
+
+const CATEGORIES = ['All', 'Burgers', 'Chicken', 'Sides', 'Drinks'];
+
+// ═══════════════════════════════════════════════════════════
+// HEADER COMPONENT
+// ═══════════════════════════════════════════════════════════
+function Header({ cartCount, onCartOpen }) {
+  return (
+    <header style={headerStyles.header}>
+      <div style={headerStyles.logo}>
+        1885<span style={{color:'#ff6347'}}>NY</span>
+      </div>
+      <button style={headerStyles.cartBtn} onClick={onCartOpen}>
+        🛒 Cart {cartCount > 0 && `(${cartCount})`}
+      </button>
+    </header>
+  );
+}
+
+const headerStyles = {
+  header: {
+    position: 'sticky',
+    top: 0,
+    zIndex: 100,
+    background: '#1a1a1a',
+    padding: '16px 32px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+  },
+  logo: {
+    fontFamily: 'Anton, Arial Black, sans-serif',
+    fontSize: 28,
+    color: '#fff',
+    letterSpacing: '0.02em',
+  },
+  cartBtn: {
+    background: '#ff6347',
+    color: '#fff',
+    border: 'none',
+    padding: '10px 20px',
+    borderRadius: 6,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 14,
+    fontWeight: 600,
+    cursor: 'pointer',
+    transition: 'transform 0.2s',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// MENU CARD COMPONENT
+// ═══════════════════════════════════════════════════════════
+function MenuCard({ item, onAdd }) {
+  const hasImage = item.img && item.img !== '';
+
+  return (
+    <div style={cardStyles.card}>
+      {hasImage && (
+        <div style={cardStyles.imgWrap}>
+          <img
+            src={item.img}
+            alt={item.name}
+            style={cardStyles.img}
+            onError={(e) => { e.target.style.display = 'none'; }}
+          />
+          {item.popular && (
+            <div style={cardStyles.badge}>🔥 Popular</div>
+          )}
+        </div>
+      )}
+      <div style={cardStyles.content}>
+        <div style={cardStyles.name}>{item.name}</div>
+        <div style={cardStyles.desc}>{item.desc}</div>
+        <div style={cardStyles.footer}>
+          <div style={cardStyles.price}>₹{item.price}</div>
+          <button style={cardStyles.addBtn} onClick={() => onAdd(item)}>
+            + Add
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+const cardStyles = {
+  card: {
+    background: '#fff',
+    borderRadius: 12,
+    overflow: 'hidden',
+    boxShadow: '0 2px 8px rgba(0,0,0,0.08)',
+    transition: 'transform 0.2s, box-shadow 0.2s',
+    cursor: 'pointer',
+  },
+  imgWrap: {
+    position: 'relative',
+    height: 180,
+    background: 'linear-gradient(135deg, #ff6347 0%, #ff8566 100%)',
+  },
+  img: {
+    width: '100%',
+    height: '100%',
+    objectFit: 'cover',
+  },
+  badge: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    background: 'rgba(255,99,71,0.95)',
+    color: '#fff',
+    padding: '6px 12px',
+    borderRadius: 20,
+    fontSize: 11,
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    letterSpacing: '0.05em',
+  },
+  content: {
+    padding: 16,
+  },
+  name: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 17,
+    fontWeight: 700,
+    color: '#1a1a1a',
+    marginBottom: 6,
+  },
+  desc: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    color: '#666',
+    lineHeight: 1.5,
+    marginBottom: 12,
+  },
+  footer: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  price: {
+    fontFamily: 'DM Mono, monospace',
+    fontSize: 20,
+    fontWeight: 600,
+    color: '#ff6347',
+  },
+  addBtn: {
+    background: '#ff6347',
+    color: '#fff',
+    border: 'none',
+    padding: '8px 16px',
+    borderRadius: 6,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// CART COMPONENT
+// ═══════════════════════════════════════════════════════════
+function Cart({ items, onClose, onUpdateQty, onRemove, onCheckout }) {
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const tax = subtotal * 0.05; // 5% tax
+  const total = subtotal + tax;
+
+  return (
+    <div style={cartStyles.overlay} onClick={onClose}>
+      <div style={cartStyles.panel} onClick={e => e.stopPropagation()}>
+        <div style={cartStyles.header}>
+          <h2 style={cartStyles.title}>Your Cart</h2>
+          <button style={cartStyles.closeBtn} onClick={onClose}>✕</button>
+        </div>
+
+        <div style={cartStyles.items}>
+          {items.length === 0 ? (
+            <div style={cartStyles.empty}>Your cart is empty</div>
+          ) : (
+            items.map(item => (
+              <div key={item.id} style={cartStyles.item}>
+                <div style={cartStyles.itemInfo}>
+                  <div style={cartStyles.itemName}>{item.name}</div>
+                  <div style={cartStyles.itemPrice}>₹{item.price} × {item.qty}</div>
+                </div>
+                <div style={cartStyles.itemControls}>
+                  <button
+                    style={cartStyles.qtyBtn}
+                    onClick={() => onUpdateQty(item.id, item.qty - 1)}
+                  >−</button>
+                  <span style={cartStyles.qty}>{item.qty}</span>
+                  <button
+                    style={cartStyles.qtyBtn}
+                    onClick={() => onUpdateQty(item.id, item.qty + 1)}
+                  >+</button>
+                  <button
+                    style={cartStyles.removeBtn}
+                    onClick={() => onRemove(item.id)}
+                  >🗑</button>
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+
+        {items.length > 0 && (
+          <div style={cartStyles.footer}>
+            <div style={cartStyles.totals}>
+              <div style={cartStyles.totalRow}>
+                <span>Subtotal:</span>
+                <span>₹{subtotal.toFixed(2)}</span>
+              </div>
+              <div style={cartStyles.totalRow}>
+                <span>Tax (5%):</span>
+                <span>₹{tax.toFixed(2)}</span>
+              </div>
+              <div style={{...cartStyles.totalRow, ...cartStyles.grandTotal}}>
+                <span>Total:</span>
+                <span>₹{total.toFixed(2)}</span>
+              </div>
+            </div>
+            <button style={cartStyles.checkoutBtn} onClick={onCheckout}>
+              Proceed to Checkout
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+const cartStyles = {
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.5)',
+    zIndex: 1000,
+    display: 'flex',
+    justifyContent: 'flex-end',
+  },
+  panel: {
+    background: '#fff',
+    width: '100%',
+    maxWidth: 420,
+    display: 'flex',
+    flexDirection: 'column',
+    boxShadow: '-4px 0 20px rgba(0,0,0,0.1)',
+  },
+  header: {
+    padding: '20px 24px',
+    borderBottom: '1px solid #e8e8e8',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  title: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 22,
+    fontWeight: 700,
+    color: '#1a1a1a',
+  },
+  closeBtn: {
+    background: 'transparent',
+    border: 'none',
+    fontSize: 24,
+    color: '#666',
+    cursor: 'pointer',
+    padding: 4,
+  },
+  items: {
+    flex: 1,
+    overflowY: 'auto',
+    padding: '16px 24px',
+  },
+  empty: {
+    textAlign: 'center',
+    padding: 40,
+    color: '#999',
+    fontFamily: 'DM Sans, Arial, sans-serif',
+  },
+  item: {
+    padding: '16px 0',
+    borderBottom: '1px solid #f0f0f0',
+  },
+  itemInfo: {
+    marginBottom: 12,
+  },
+  itemName: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 15,
+    fontWeight: 600,
+    color: '#1a1a1a',
+    marginBottom: 4,
+  },
+  itemPrice: {
+    fontFamily: 'DM Mono, monospace',
+    fontSize: 13,
+    color: '#666',
+  },
+  itemControls: {
+    display: 'flex',
+    alignItems: 'center',
+    gap: 12,
+  },
+  qtyBtn: {
+    background: '#f4f4f4',
+    border: 'none',
+    width: 32,
+    height: 32,
+    borderRadius: 6,
+    fontSize: 16,
+    cursor: 'pointer',
+    fontWeight: 600,
+  },
+  qty: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 15,
+    fontWeight: 600,
+    minWidth: 30,
+    textAlign: 'center',
+  },
+  removeBtn: {
+    background: 'transparent',
+    border: 'none',
+    marginLeft: 'auto',
+    cursor: 'pointer',
+    fontSize: 18,
+  },
+  footer: {
+    padding: 24,
+    borderTop: '1px solid #e8e8e8',
+  },
+  totals: {
+    marginBottom: 20,
+  },
+  totalRow: {
+    display: 'flex',
+    justifyContent: 'space-between',
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  grandTotal: {
+    fontSize: 18,
+    fontWeight: 700,
+    color: '#1a1a1a',
+    paddingTop: 12,
+    borderTop: '2px solid #e8e8e8',
+    marginTop: 8,
+  },
+  checkoutBtn: {
+    width: '100%',
+    background: '#ff6347',
+    color: '#fff',
+    border: 'none',
+    padding: 16,
+    borderRadius: 8,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 16,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// ORDER CONFIRM COMPONENT
+// ═══════════════════════════════════════════════════════════
+function OrderConfirm({ items, onClose }) {
+  const subtotal = items.reduce((sum, item) => sum + (item.price * item.qty), 0);
+  const tax = subtotal * 0.05;
+  const total = subtotal + tax;
+
+  return (
+    <div style={confirmStyles.overlay} onClick={onClose}>
+      <div style={confirmStyles.modal} onClick={e => e.stopPropagation()}>
+        <div style={confirmStyles.icon}>✓</div>
+        <h2 style={confirmStyles.title}>Order Placed!</h2>
+        <p style={confirmStyles.message}>
+          Your order has been successfully placed. Total: ₹{total.toFixed(2)}
+        </p>
+        <button style={confirmStyles.btn} onClick={onClose}>
+          Close
+        </button>
+      </div>
+    </div>
+  );
+}
+
+const confirmStyles = {
+  overlay: {
+    position: 'fixed',
+    inset: 0,
+    background: 'rgba(0,0,0,0.6)',
+    zIndex: 2000,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modal: {
+    background: '#fff',
+    borderRadius: 16,
+    padding: 40,
+    maxWidth: 400,
+    textAlign: 'center',
+  },
+  icon: {
+    width: 80,
+    height: 80,
+    borderRadius: '50%',
+    background: '#4caf50',
+    color: '#fff',
+    fontSize: 48,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: '0 auto 20px',
+  },
+  title: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 24,
+    fontWeight: 700,
+    color: '#1a1a1a',
+    marginBottom: 12,
+  },
+  message: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 15,
+    color: '#666',
+    marginBottom: 24,
+    lineHeight: 1.6,
+  },
+  btn: {
+    background: '#ff6347',
+    color: '#fff',
+    border: 'none',
+    padding: '12px 32px',
+    borderRadius: 8,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 15,
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// MAIN APP COMPONENT
+// ═══════════════════════════════════════════════════════════
+function App() {
+  const [cart, setCart] = useState([]);
+  const [cartOpen, setCartOpen] = useState(false);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [search, setSearch] = useState('');
+
+  // Load cart from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('1885ny-cart');
+      if (saved) setCart(JSON.parse(saved));
+    } catch(e) {
+      console.error('Failed to load cart:', e);
+    }
+  }, []);
+
+  // Persist cart
+  useEffect(() => {
+    try {
+      localStorage.setItem('1885ny-cart', JSON.stringify(cart));
+    } catch(e) {
+      console.error('Failed to save cart:', e);
+    }
+  }, [cart]);
+
+  function addToCart(item) {
+    setCart(prev => {
+      const exists = prev.find(i => i.id === item.id);
+      if (exists) {
+        return prev.map(i => i.id === item.id ? {...i, qty: i.qty + 1} : i);
+      }
+      return [...prev, {...item, qty: 1}];
+    });
+  }
+
+  function updateQty(id, qty) {
+    if (qty <= 0) {
+      removeItem(id);
+      return;
+    }
+    setCart(prev => prev.map(i => i.id === id ? {...i, qty} : i));
+  }
+
+  function removeItem(id) {
+    setCart(prev => prev.filter(i => i.id !== id));
+  }
+
+  function handleCheckout() {
+    setCartOpen(false);
+    setCheckoutOpen(true);
+  }
+
+  function handleOrderClose() {
+    setCheckoutOpen(false);
+    setCart([]);
+  }
+
+  const cartCount = cart.reduce((s, i) => s + i.qty, 0);
+
+  const filtered = MENU_ITEMS.filter(item => {
+    const matchCat = activeCategory === 'All' || item.category === activeCategory;
+    const matchSearch = item.name.toLowerCase().includes(search.toLowerCase());
+    return matchCat && matchSearch;
+  });
+
+  return (
+    <div>
+      <Header cartCount={cartCount} onCartOpen={() => setCartOpen(true)} />
+
+      {/* Hero Strip */}
+      <div style={appStyles.hero}>
+        <div style={appStyles.heroOverlay} />
+        <div style={appStyles.heroContent}>
+          <div style={appStyles.heroTagline}>DELICIOUS · CHEF-DRIVEN · SMASH BURGERS</div>
+          <div style={appStyles.heroTitle}>Order Online</div>
+          <div style={appStyles.heroSub}>Fresh, fast, smashed to perfection. Pick up at UNOS Food Market, Gachibowli.</div>
+        </div>
+      </div>
+
+      {/* Filter + Search bar */}
+      <div style={appStyles.filterBar}>
+        <div style={appStyles.categories}>
+          {CATEGORIES.map(cat => (
+            <button
+              key={cat}
+              style={cat === activeCategory ? appStyles.catBtnActive : appStyles.catBtn}
+              onClick={() => setActiveCategory(cat)}
+            >
+              {cat}
+            </button>
+          ))}
+        </div>
+        <div style={appStyles.searchWrap}>
+          <span style={appStyles.searchIcon}>⌕</span>
+          <input
+            style={appStyles.searchInput}
+            placeholder="Search menu..."
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+          />
+        </div>
+      </div>
+
+      {/* Menu Grid */}
+      <div style={appStyles.main}>
+        {filtered.length === 0 ? (
+          <div style={appStyles.emptyState}>No items found{search && ` for "${search}"`}</div>
+        ) : (
+          <div style={appStyles.grid}>
+            {filtered.map(item => (
+              <MenuCard key={item.id} item={item} onAdd={addToCart} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Footer */}
+      <footer style={appStyles.footer}>
+        <div style={appStyles.footerLogo}>1885<span style={{color:'#ff6347'}}>NY</span></div>
+        <div style={appStyles.footerText}>UNOS Food Market, Gachibowli, Hyderabad · Telangana</div>
+        <div style={appStyles.footerCopy}>© 2024 1885NY Smash Burgers. All rights reserved.</div>
+      </footer>
+
+      {cartOpen && (
+        <Cart
+          items={cart}
+          onClose={() => setCartOpen(false)}
+          onUpdateQty={updateQty}
+          onRemove={removeItem}
+          onCheckout={handleCheckout}
+        />
+      )}
+
+      {checkoutOpen && (
+        <OrderConfirm items={cart} onClose={handleOrderClose} />
+      )}
+    </div>
+  );
+}
+
+const appStyles = {
+  hero: {
+    position: 'relative',
+    height: 260,
+    backgroundImage: 'url(/assets/hero-burger.jpg)',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+    backgroundBlendMode: 'darken',
+    backgroundColor: 'rgba(0,0,0,0.45)',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  heroOverlay: {
+    position: 'absolute',
+    inset: 0,
+    background: 'linear-gradient(to bottom, rgba(0,0,0,0.3), rgba(0,0,0,0.6))',
+  },
+  heroContent: {
+    position: 'relative',
+    textAlign: 'center',
+    padding: '0 20px',
+  },
+  heroTagline: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 11,
+    letterSpacing: '0.18em',
+    color: '#ff6347',
+    fontWeight: 700,
+    textTransform: 'uppercase',
+    marginBottom: 10,
+  },
+  heroTitle: {
+    fontFamily: 'Anton, Arial Black, sans-serif',
+    fontSize: 56,
+    color: '#fff',
+    lineHeight: 1,
+    marginBottom: 12,
+  },
+  heroSub: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 15,
+    color: 'rgba(255,255,255,0.8)',
+    maxWidth: 480,
+    margin: '0 auto',
+    lineHeight: 1.6,
+  },
+
+  filterBar: {
+    background: '#fff',
+    borderBottom: '1px solid #e8e8e8',
+    padding: '12px 32px',
+    display: 'flex',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    position: 'sticky',
+    top: 64,
+    zIndex: 50,
+  },
+  categories: {
+    display: 'flex',
+    gap: 6,
+  },
+  catBtn: {
+    background: 'transparent',
+    border: '1px solid #e0e0e0',
+    color: '#555',
+    padding: '7px 16px',
+    borderRadius: 999,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    fontWeight: 600,
+    cursor: 'pointer',
+  },
+  catBtnActive: {
+    background: '#ff6347',
+    border: '1px solid #ff6347',
+    color: '#fff',
+    padding: '7px 16px',
+    borderRadius: 999,
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    fontWeight: 700,
+    cursor: 'pointer',
+  },
+  searchWrap: {
+    position: 'relative',
+  },
+  searchIcon: {
+    position: 'absolute',
+    left: 10,
+    top: '50%',
+    transform: 'translateY(-50%)',
+    color: '#aaa',
+    fontSize: 16,
+    pointerEvents: 'none',
+  },
+  searchInput: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    padding: '8px 12px 8px 30px',
+    border: '1px solid #e0e0e0',
+    borderRadius: 999,
+    outline: 'none',
+    width: 200,
+  },
+
+  main: {
+    maxWidth: 1100,
+    margin: '0 auto',
+    padding: '32px 24px',
+  },
+  grid: {
+    display: 'grid',
+    gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))',
+    gap: 20,
+  },
+  emptyState: {
+    textAlign: 'center',
+    padding: 60,
+    color: '#888',
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 16,
+  },
+
+  footer: {
+    background: '#1a1a1a',
+    padding: '32px',
+    textAlign: 'center',
+    marginTop: 40,
+  },
+  footerLogo: {
+    fontFamily: 'Anton, Arial Black, sans-serif',
+    fontSize: 28,
+    color: '#fff',
+    marginBottom: 8,
+  },
+  footerText: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 13,
+    color: '#888',
+    marginBottom: 6,
+  },
+  footerCopy: {
+    fontFamily: 'DM Sans, Arial, sans-serif',
+    fontSize: 11,
+    color: '#555',
+  },
+};
+
+// ═══════════════════════════════════════════════════════════
+// RENDER APP
+// ═══════════════════════════════════════════════════════════
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+    </script>
+</body>
+</html>
